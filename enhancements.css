@@ -21,7 +21,7 @@
   border-radius: 6px;
   color: #263a2b;
   background: #fbfcf9;
-  font-size: 15px;
+  font-size: 22.5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -31,7 +31,7 @@
 .budget-guidance { color: #3f6144; font-weight: 600; }
 .budget-control > div:last-child { display: grid; gap: 5px; }
 .part-searches { flex-wrap: wrap; }
-.part-searches a { min-width: 78px; }
+.part-searches a { min-width: 78px; font-size: 10px; }
 
 @media (max-width: 760px) {
   .budget-control { grid-template-columns: minmax(0, 1fr); gap: 10px; }
@@ -44,7 +44,7 @@
 @media (max-width: 560px) {
   .budget-control { margin-top: 10px; padding: 14px; }
   .part-searches { width: 100%; padding-left: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .part-searches a { min-width: 0; }
+  .part-searches a { min-width: 0; font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; }

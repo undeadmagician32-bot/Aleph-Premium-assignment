@@ -1,10 +1,10 @@
 /* 추가 큰 글씨, 만 원 단위 예산 입력, 판매처 네 곳 검색 */
 (() => {
   const shops = [
-    { name: '다나와', key: 'danawa', url: query => `https://search.danawa.com/dsearch.php?query=${encodeURIComponent(query)}` },
-    { name: '네이버', key: 'naver', url: query => `https://search.shopping.naver.com/search/all?query=${encodeURIComponent(query)}` },
-    { name: '쿠팡', key: 'coupang', url: query => `https://www.coupang.com/np/search?q=${encodeURIComponent(query)}` },
-    { name: 'G마켓', key: 'gmarket', url: query => `https://browse.gmarket.co.kr/search?keyword=${encodeURIComponent(query)}` }
+    { name: '다나와', url: query => `https://search.danawa.com/dsearch.php?query=${encodeURIComponent(query)}` },
+    { name: '네이버', url: query => `https://search.shopping.naver.com/search/all?query=${encodeURIComponent(query)}` },
+    { name: '쿠팡', url: query => `https://www.coupang.com/np/search?q=${encodeURIComponent(query)}` },
+    { name: 'G마켓', url: query => `https://browse.gmarket.co.kr/search?keyword=${encodeURIComponent(query)}` }
   ];
   const stepWon = 10000;
   const minWon = 300000;
@@ -25,25 +25,30 @@
       </div>
     </section>`;
 
+  const originalFontSizes = new WeakMap();
   function scaleText(root = document) {
     const candidates = [...root.querySelectorAll('*')].filter(element =>
-      [...element.childNodes].some(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim()) &&
-      !element.hasAttribute('data-readable-base')
+      [...element.childNodes].some(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim())
     );
-    // 모든 원래 크기를 먼저 읽어 부모 글씨 확대가 자식에 중복 적용되지 않게 합니다.
-    const sizes = candidates.map(element => [element, Number.parseFloat(getComputedStyle(element).fontSize)]);
-    sizes.forEach(([element, size]) => {
-      if (Number.isFinite(size)) {
-        element.dataset.readableBase = String(size);
-        element.style.fontSize = `${size * 1.5}px`;
+    // 렌더링 때마다 브라우저 스타일 기준의 150%를 다시 적용해 중복 확대를 막습니다.
+    candidates.forEach(element => {
+      if (!originalFontSizes.has(element)) {
+        originalFontSizes.set(element, element.style.fontSize || '');
       }
+      const computedSize = Number.parseFloat(getComputedStyle(element).fontSize);
+      if (!Number.isFinite(computedSize)) return;
+      const currentSize = Number.parseFloat(element.style.fontSize);
+      const originalInline = originalFontSizes.get(element);
+      const baseSize = currentSize && originalInline !== element.style.fontSize
+        ? computedSize / 1.5
+        : computedSize;
+      element.style.fontSize = `${baseSize * 1.5}px`;
     });
   }
 
   function resetAndScaleText() {
-    document.querySelectorAll('[data-readable-base]').forEach(element => {
-      element.style.removeProperty('font-size');
-      delete element.dataset.readableBase;
+    document.querySelectorAll('*').forEach(element => {
+      if (originalFontSizes.has(element)) element.style.fontSize = originalFontSizes.get(element);
     });
     scaleText();
   }
@@ -138,7 +143,7 @@
   usecaseList.addEventListener('click', syncBudgetToTier);
   tierList.addEventListener('click', syncBudgetToTier);
 
-  // 화면 크기가 바뀌면 반응형 글자 크기를 다시 계산합니다.
+  // 화면 크기 변경 때 기준 글자 크기를 다시 계산해 확대율이 누적되지 않게 합니다.
   let resizeFrame = 0;
   window.addEventListener('resize', () => {
     cancelAnimationFrame(resizeFrame);

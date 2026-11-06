@@ -99,6 +99,49 @@ function makeSearchUrl(shop, query) {
     : `https://search.shopping.naver.com/search/all?query=${q}`;
 }
 
+function recommendationReason(name, product) {
+  if (name === 'CPU') {
+    if (product.includes('5600G')) return '일상 작업에 필요한 CPU 성능과 그래픽 기능을 한 칩에서 제공해 별도 그래픽카드 비용을 줄일 수 있어요.';
+    if (product.includes('8600G')) return '여러 앱을 함께 쓰기 좋은 최신 플랫폼과 내장 그래픽을 갖춰, 별도 그래픽카드 없이 시작하기 좋아요.';
+    if (product.includes('5600')) return '게임용 예산에서 CPU 비용을 합리적으로 유지하고 그래픽카드에 예산을 배분하기 좋은 선택이에요.';
+    if (product.includes('7500F')) return '게임 처리에 필요한 CPU 성능을 제공하고 AM5 플랫폼으로 향후 업그레이드 여지를 고려했어요.';
+    if (product.includes('7800X3D')) return '높은 프레임을 목표로 하는 게임 중심 구성에서 CPU 성능을 중시한 선택이에요.';
+    if (product.includes('Ryzen 5 7600')) return '사진 편집과 가벼운 영상 작업에 균형 잡힌 성능을 제공하는 작업용 기반이에요.';
+    if (product.includes('7900')) return '멀티코어를 활용하는 편집 작업과 여러 앱을 함께 실행할 때 여유를 기대할 수 있어요.';
+  }
+  if (name === '메인보드') {
+    const platform = product.includes('AM4') ? 'AM4' : 'AM5';
+    const chipset = product.split(' · ')[0];
+    return `${selectedTier.parts[0][1]} CPU와 같은 ${platform} 플랫폼으로 맞춘 ${chipset} 보드예요. 필요한 슬롯과 기능을 확인해 선택하세요.`;
+  }
+  if (name === '메모리') {
+    if (product.includes('16GB')) return '문서·웹 위주 사용에 필요한 기본 용량을 두 장으로 구성해 내장 그래픽의 메모리 대역폭도 고려했어요.';
+    if (product.includes('64GB')) return '고해상도 편집과 큰 프로젝트, 여러 앱 동시 실행에서 메모리 부족을 줄이기 위한 용량이에요.';
+    if (selectedUsecase.id === 'gaming') return '요즘 게임과 백그라운드 앱을 함께 실행할 때 여유를 두도록 32GB로 구성했어요.';
+    return '편집 프로그램과 여러 앱을 함께 사용할 때 작업 공간을 확보하도록 32GB로 구성했어요.';
+  }
+  if (name === '저장장치') {
+    if (product.includes('500GB')) return '운영체제와 자주 쓰는 프로그램을 빠르게 실행하면서 기본 구매 비용을 낮추기 위한 용량이에요.';
+    if (product.includes('2TB')) return '게임 라이브러리나 대용량 프로젝트 파일을 넉넉하게 보관할 수 있도록 용량을 늘렸어요.';
+    if (product.includes('추가 드라이브')) return '작업 프로그램과 원본 파일 공간을 함께 고려한 구성으로, 중요 자료는 별도 백업도 필요해요.';
+    return '운영체제와 프로그램, 게임 또는 현재 프로젝트를 한 드라이브에 담기 좋은 균형 용량이에요.';
+  }
+  if (name === '그래픽카드') {
+    if (product.includes('내장 그래픽')) return '문서·웹·영상 시청에는 별도 그래픽카드 없이 시작해 비용과 전력 소비를 줄일 수 있어요.';
+    if (product.includes('RX 7600')) return '1080p 게임을 겨냥해 그래픽 성능에 예산을 우선 배분한 구성 예시예요.';
+    if (product.includes('4060 Ti')) return '더 높은 옵션이나 1440p 게임을 고려한 단계예요. 게임별 VRAM 요구량을 함께 확인하세요.';
+    if (product.includes('4070 SUPER')) return '고해상도·높은 그래픽 옵션 또는 GPU 가속 작업을 고려한 상위 성능급 예시예요.';
+    if (product.includes('RTX 4060')) return '일부 편집 프로그램의 GPU 가속과 3D 작업 입문을 고려한 선택이에요.';
+  }
+  if (name === '파워') {
+    return '추천된 그래픽카드와 나머지 부품의 전력 공급을 고려한 정격 용량 급이에요. 실제 모델의 권장 용량과 커넥터를 확인하세요.';
+  }
+  if (name.includes('케이스')) {
+    return '부품 조립과 공기 흐름을 고려한 형태예요. 구매할 정확한 모델의 그래픽카드 길이, 쿨러 높이와 통풍을 확인하세요.';
+  }
+  return '사용 목적과 구성 단계에 맞춰 성능과 비용의 균형을 고려한 부품 예시예요.';
+}
+
 function renderUsecases() {
   usecaseList.innerHTML = catalog.map(item => `
     <button type="button" class="usecase-card" data-id="${item.id}" aria-pressed="${item.id === selectedUsecase.id}">
@@ -119,7 +162,7 @@ function renderTiers() {
 function renderBuild() {
   const parts = selectedTier.parts.map(([name, product, note]) => `
     <article class="part-row">
-      <div class="part-info"><span class="part-name">${name}</span><strong>${product}</strong><small>${note}</small></div>
+      <div class="part-info"><span class="part-name">${name}</span><strong>${product}</strong><small>${note}</small><small class="part-reason"><strong>추천 이유</strong> · ${recommendationReason(name, product)}</small></div>
       <div class="part-searches">
         <a href="${makeSearchUrl('danawa', product)}" target="_blank" rel="noopener noreferrer" aria-label="${product} 다나와 가격 검색 (새 창)">다나와 <span aria-hidden="true">↗</span></a>
         <a href="${makeSearchUrl('naver', product)}" target="_blank" rel="noopener noreferrer" aria-label="${product} 네이버 쇼핑 가격 검색 (새 창)">네이버 <span aria-hidden="true">↗</span></a>
@@ -132,7 +175,7 @@ function renderBuild() {
       <div class="budget"><small>예상 본체 예산</small><strong>${selectedTier.price}</strong><span>참고 범위 · 실시간가 아님</span></div>
     </div>
     <div class="parts-list">${parts}</div>
-    <div class="detail-footnote"><span aria-hidden="true">ⓘ</span> 부품명은 해당 등급의 예시예요. 검색 결과에서 정확한 제품 모델, 가격, 판매 조건을 비교해 주세요.</div>`;
+    <div class="detail-footnote"><span aria-hidden="true">ⓘ</span> 부품명은 해당 등급의 예시예요. 추천 이유는 용도와 일반적인 부품 역할에 따른 간략한 설명이며, 구매 전 정확한 모델의 성능과 호환성을 확인해 주세요. 검색 결과에서 정확한 제품 모델, 가격, 판매 조건을 비교해 주세요.</div>`;
 }
 
 function updateView(view) {
