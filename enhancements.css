@@ -1,0 +1,54 @@
+/* 읽기 쉬운 예산 입력과 네 곳의 상품 검색 링크 */
+.budget-control {
+  display: grid;
+  grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr);
+  align-items: center;
+  gap: 12px 24px;
+  margin: 14px 0 0;
+  padding: 17px 18px;
+  border: 1px solid #e2e5db;
+  border-radius: 8px;
+  background: #fff;
+}
+.budget-field { display: grid; gap: 7px; }
+.budget-field label { color: #354735; font-weight: 700; }
+.budget-input-row { display: flex; align-items: center; gap: 8px; }
+.budget-input-row input {
+  width: min(100%, 230px);
+  min-height: 46px;
+  padding: 9px 12px;
+  border: 1px solid #bdc9b7;
+  border-radius: 6px;
+  color: #263a2b;
+  background: #fbfcf9;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.budget-input-row input:focus-visible { outline: 3px solid #8aa575; outline-offset: 2px; }
+.budget-unit { color: #596454; font-weight: 600; }
+.budget-help, .budget-guidance { margin: 0; color: #697265; line-height: 1.6; }
+.budget-guidance { color: #3f6144; font-weight: 600; }
+.budget-control > div:last-child { display: grid; gap: 5px; }
+.part-searches { flex-wrap: wrap; }
+.part-searches a { min-width: 78px; }
+
+@media (max-width: 760px) {
+  .budget-control { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .part-searches {
+    display: grid;
+    width: min(100%, 420px);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .budget-control { margin-top: 10px; padding: 14px; }
+  .part-searches { width: 100%; padding-left: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .part-searches a { min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}
+@media (forced-colors: active) {
+  .budget-control { border: 1px solid CanvasText; }
+}
